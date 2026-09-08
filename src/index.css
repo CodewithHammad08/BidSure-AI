@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================
+   BIDSURE AI — DESIGN SYSTEM TOKENS
+   ============================================================ */
+
+:root {
+  /* Primary — Slate blue for government/enterprise trust */
+  --color-primary-50:  #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-900: #1e3a8a;
+
+  /* Neutrals — Cool slate for enterprise feel */
+  --color-neutral-0:   #ffffff;
+  --color-neutral-50:  #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  --color-neutral-950: #020617;
+
+  /* Semantic */
+  --color-pass:    #16a34a;
+  --color-pass-bg: #f0fdf4;
+  --color-warn:    #d97706;
+  --color-warn-bg: #fffbeb;
+  --color-danger:  #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-info:    #2563eb;
+  --color-info-bg: #eff6ff;
+  --color-missing: #7c3aed;
+  --color-missing-bg: #f5f3ff;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --topbar-height: 60px;
+}
+
+/* ============================================================
+   BASE RESET & TYPOGRAPHY
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-900);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   SCROLLBARS
+   ============================================================ */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--color-neutral-100); }
+::-webkit-scrollbar-thumb { background: var(--color-neutral-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-neutral-400); }
+
+/* ============================================================
+   CUSTOM UTILITIES
+   ============================================================ */
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Status Badge Colors */
+.badge-pass       { background: var(--color-pass-bg);    color: var(--color-pass);    border: 1px solid #bbf7d0; }
+.badge-warn       { background: var(--color-warn-bg);    color: var(--color-warn);    border: 1px solid #fde68a; }
+.badge-danger     { background: var(--color-danger-bg);  color: var(--color-danger);  border: 1px solid #fecaca; }
+.badge-info       { background: var(--color-info-bg);    color: var(--color-info);    border: 1px solid #bfdbfe; }
+.badge-missing    { background: var(--color-missing-bg); color: var(--color-missing); border: 1px solid #ddd6fe; }
+.badge-neutral    { background: var(--color-neutral-100); color: var(--color-neutral-600); border: 1px solid var(--color-neutral-200); }
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--color-neutral-900);
+  border-right: 1px solid var(--color-neutral-800);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card */
+.card {
+  background: white;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* Table */
+.table-row:hover { background: var(--color-neutral-50); }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Confidence bar */
+.conf-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-neutral-200);
+  overflow: hidden;
+}
+.conf-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Processing steps */
+.step-active   { border-color: var(--color-primary-500); background: var(--color-primary-50); }
+.step-done     { border-color: var(--color-pass); background: var(--color-pass-bg); }
+.step-pending  { border-color: var(--color-neutral-200); background: white; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease both; }
+.animate-spin-slow { animation: spin 1.2s linear infinite; }
+
+/* Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Score ring */
+.score-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Evidence panel */
+.evidence-panel {
+  background: #fafbfc;
+  border: 1px dashed var(--color-neutral-300);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.evidence-quote {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--color-neutral-900);
+  color: #e2e8f0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  line-height: 1.6;
+  border-left: 3px solid var(--color-primary-500);
+}
+
+/* Topbar */
+.topbar {
+  height: var(--topbar-height);
+  background: white;
+  border-bottom: 1px solid var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+/* Page */
+.page-container {
+  padding: 28px 28px 40px;
+  flex: 1;
+}
+
+/* Similarity meter */
+.similarity-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-neutral-200);
+  overflow: hidden;
+}
+
+/* Navigation active */
+.nav-item-active {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border-left: 2px solid #3b82f6;
+}
+.nav-item-active svg { color: #3b82f6; }
