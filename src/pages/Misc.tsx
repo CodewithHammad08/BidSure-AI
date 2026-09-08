@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { AUDIT_LOGS, VERIFICATION_PROVIDERS } from '../data/mockData';
+import { useParams } from 'react-router-dom';
+import { AUDIT_LOGS, VERIFICATION_PROVIDERS, BIDDERS } from '../data/mockData';
 import { AppShell, Topbar } from '../components/layout';
 import { PageHeader, SectionCard } from '../components/shared';
-import { CheckCircle, AlertTriangle, Clock, XCircle, ExternalLink, Filter } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Clock, Filter } from 'lucide-react';
 
 // ============================================================
 // AUDIT TRAIL
@@ -77,7 +78,7 @@ export function AuditTrailPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((log, idx) => (
+                {filtered.map(log => (
                   <tr key={log.id} style={{ borderBottom: '1px solid #f8fafc' }} className="table-row">
                     <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
                       <div style={{ fontSize: 12, color: '#334155', fontFamily: 'monospace' }}>
@@ -323,11 +324,8 @@ export function SettingsPage() {
 // BIDDER COMPARISON
 // ============================================================
 export function BidderComparisonPage() {
-  const navigate = useNavigate();
   const { tenderId } = useParams<{ tenderId: string }>();
-  const { BIDDERS: bidders, COMPLIANCE_SCORES } = { BIDDERS: require('../data/mockData').BIDDERS, COMPLIANCE_SCORES: require('../data/mockData').COMPLIANCE_SCORES };
-
-  const tenderBidders = bidders.filter((b: any) => b.tenderId === (tenderId ?? 'tender-001'));
+  const tenderBidders = BIDDERS.filter(b => b.tenderId === (tenderId ?? 'tender-001'));
 
   return (
     <AppShell>
@@ -371,7 +369,7 @@ export function BidderComparisonPage() {
                 { label: 'Critical Findings', render: (b: any) => <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 700, color: b.criticalFindings > 0 ? '#dc2626' : '#16a34a' }}>{b.criticalFindings}</div> },
                 { label: 'Status', render: (b: any) => <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: b.status === 'REVIEW_REQUIRED' ? '#d97706' : '#16a34a' }}>{b.status === 'REVIEW_REQUIRED' ? '⚠ Review Required' : '✓ Analysis Complete'}</div> },
                 { label: 'GST Certificate', render: (b: any) => <div style={{ textAlign: 'center' }}>{b.id !== 'bidder-c' ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓ Present</span> : <><span style={{ color: '#dc2626', fontWeight: 700 }}>✕ Expired</span><div style={{ fontSize: 10, color: '#94a3b8' }}>01 Jun 2025</div></>}</div> },
-                { label: 'MSME Certificate', render: (b: any) => <div style={{ textAlign: 'center', color: '#16a34a', fontWeight: 700 }}>✓ Present</div> },
+                { label: 'MSME Certificate', render: () => <div style={{ textAlign: 'center', color: '#16a34a', fontWeight: 700 }}>✓ Present</div> },
                 { label: 'OEM Authorization', render: (b: any) => <div style={{ textAlign: 'center' }}>{b.id === 'bidder-c' ? <span style={{ color: '#7c3aed', fontWeight: 700 }}>○ Missing</span> : <span style={{ color: '#16a34a', fontWeight: 700 }}>✓ Present</span>}</div> },
                 { label: 'Entity Consistency', render: (b: any) => <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: b.id === 'bidder-a' ? '#16a34a' : b.id === 'bidder-b' ? '#d97706' : '#dc2626' }}>{b.id === 'bidder-a' ? '100% Match' : b.id === 'bidder-b' ? '71% – Review' : '41% – Mismatch'}</div> },
                 { label: 'Certificate Validity', render: (b: any) => <div style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: b.id === 'bidder-c' ? '#dc2626' : '#16a34a' }}>{b.id === 'bidder-c' ? '✕ Expired' : '✓ Valid'}</div> },

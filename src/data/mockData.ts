@@ -1,6 +1,6 @@
 import type {
   Tender, Requirement, Bidder, Document, ExtractedField,
-  ComplianceCheck, Finding, Evidence, EntityComparison,
+  ComplianceCheck, Finding, EntityComparison,
   ComplianceScore, AuditLog, VerificationProvider, DashboardStats
 } from '../types';
 

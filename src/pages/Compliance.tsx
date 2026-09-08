@@ -208,7 +208,6 @@ export function CrossDocVerificationPage() {
   const navigate = useNavigate();
   const bidder = BIDDERS.find(b => b.id === id);
   const comparisons = ENTITY_COMPARISONS[id ?? ''] ?? [];
-  const tender = TENDERS.find(t => t.id === bidder?.tenderId);
 
   const resultColors: Record<string, string> = {
     MATCH: '#16a34a',
@@ -322,7 +321,6 @@ export function CrossDocVerificationPage() {
 // ============================================================
 export function ComplianceScorePage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const bidder = BIDDERS.find(b => b.id === id);
   const score = COMPLIANCE_SCORES[id ?? ''];
 

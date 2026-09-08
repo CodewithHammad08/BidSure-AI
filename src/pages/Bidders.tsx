@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, Search, Filter, Upload, FileText, Hash, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Search, Upload, FileText, AlertTriangle } from 'lucide-react';
 import { BIDDERS, DOCUMENTS, EXTRACTED_FIELDS, TENDERS } from '../data/mockData';
 import { AppShell, Topbar } from '../components/layout';
 import { PageHeader, RiskChip, DocStatusBadge, SectionCard, EmptyState, ConfidenceBar, ScoreRing } from '../components/shared';

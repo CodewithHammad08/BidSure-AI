@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, FileText, Users, Calendar, Building2, CheckCircle, Clock } from 'lucide-react';
+import { ArrowRight, FileText, Users, Calendar, Building2, CheckCircle } from 'lucide-react';
 import { TENDERS, REQUIREMENTS, BIDDERS } from '../data/mockData';
 import { AppShell, Topbar } from '../components/layout';
 import { PageHeader, StatusBadge, SectionCard, EmptyState } from '../components/shared';

@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import {
   FileText, Users, FolderOpen, AlertTriangle,
-  TrendingDown, Clock, CheckCircle, ArrowRight,
-  Activity
+  ArrowRight, Activity
 } from 'lucide-react';
 import { TENDERS, BIDDERS, FINDINGS, DASHBOARD_STATS, AUDIT_LOGS } from '../data/mockData';
 import { AppShell, Topbar } from '../components/layout';
@@ -163,7 +162,7 @@ export default function Dashboard() {
               <button onClick={() => navigate('/findings')} className="text-xs text-blue-600 hover:text-blue-700 font-medium">All findings →</button>
             }
           >
-            <div style={{ divide: 'y' }}>
+            <div>
               {openFindings.slice(0, 5).map((finding) => (
                 <div
                   key={finding.id}

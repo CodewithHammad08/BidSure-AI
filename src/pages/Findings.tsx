@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FINDINGS, AUDIT_LOGS, BIDDERS } from '../data/mockData';
+import { FINDINGS } from '../data/mockData';
 import { AppShell, Topbar } from '../components/layout';
-import { PageHeader, SeverityBadge, SectionCard, EmptyState } from '../components/shared';
+import { PageHeader, SeverityBadge, EmptyState } from '../components/shared';
 import type { FindingSeverity, FindingType, FindingDecision } from '../types';
 import { AlertTriangle, FileText, CheckCircle, MessageSquare, X, ArrowRight } from 'lucide-react';
 
@@ -149,7 +149,6 @@ export function EvidenceViewerPage() {
     </AppShell>
   );
 
-  const bidder = BIDDERS.find(b => b.id === finding.bidderId);
   const activeEvidence = finding.evidence[activeEvidenceIdx];
 
   const handleDecision = (d: FindingDecision) => {
@@ -168,10 +167,6 @@ export function EvidenceViewerPage() {
     { key: 'DISMISS', label: 'Dismiss Finding', icon: <X size={14} />, color: '#64748b', bg: '#f8fafc' },
     { key: 'REQUEST_CLARIFICATION', label: 'Request Clarification', icon: <MessageSquare size={14} />, color: '#d97706', bg: '#fffbeb' },
   ];
-
-  const severityColors: Record<string, string> = {
-    CRITICAL: '#dc2626', HIGH: '#dc2626', MEDIUM: '#d97706', LOW: '#94a3b8',
-  };
 
   return (
     <AppShell>
@@ -356,7 +351,7 @@ export function EvidenceViewerPage() {
               {finding.evidence.length > 1 && (
                 <div style={{ marginBottom: 12 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Comparison</div>
-                  {finding.evidence.map((ev, idx) => (
+                  {finding.evidence.map(ev => (
                     <div key={ev.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
                       <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: 5 }} />
                       <div>
