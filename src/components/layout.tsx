@@ -30,22 +30,25 @@ export function Sidebar() {
   return (
     <nav className="sidebar">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-neutral-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-            <Scale size={16} color="white" />
+      <div className="px-5 py-5 border-b border-slate-800/80">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
+            <Scale size={18} color="white" />
           </div>
           <div>
-            <div className="text-white font-bold text-sm leading-none">BidSure AI</div>
-            <div className="text-neutral-500 text-[10px] leading-none mt-0.5">Compliance Intelligence</div>
+            <div className="text-white font-extrabold text-base tracking-tight leading-none flex items-center gap-1.5">
+              BidSure <span className="text-indigo-400 text-xs px-1.5 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 font-semibold">AI</span>
+            </div>
+            <div className="text-slate-400 text-[10px] font-medium leading-none mt-1">Compliance Intelligence Platform</div>
           </div>
         </div>
       </div>
 
       {/* System notice */}
-      <div className="px-4 py-2.5 bg-blue-950/50 border-b border-blue-900/40 mx-3 mt-3 rounded-md">
-        <div className="text-[10px] text-blue-400 font-medium leading-relaxed">
-          ⚠ PROTOTYPE — Decision support only. All final decisions remain with the Procurement Officer.
+      <div className="px-3.5 py-2.5 bg-indigo-950/40 border border-indigo-500/20 mx-3 mt-3.5 rounded-lg shadow-inner">
+        <div className="text-[10px] text-indigo-300 font-medium leading-relaxed flex items-start gap-1.5">
+          <span className="text-amber-400 font-bold flex-shrink-0">⚠</span>
+          <span><strong>DECISION SUPPORT:</strong> All final determinations remain with the Procurement Officer.</span>
         </div>
       </div>
 
