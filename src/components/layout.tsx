@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import clsx from 'clsx';
 import {
   LayoutDashboard, FileText, Users, FolderOpen,
   ShieldCheck, AlertTriangle, CheckSquare, ClipboardList,
@@ -30,93 +29,76 @@ export function Sidebar() {
   return (
     <nav className="sidebar">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-slate-800/80">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
-            <Scale size={18} color="white" />
+      <div className="sidebar-header">
+        <div className="sidebar-logo-container">
+          <div className="sidebar-logo-icon">
+            <Scale size={20} color="white" />
           </div>
           <div>
-            <div className="text-white font-extrabold text-base tracking-tight leading-none flex items-center gap-1.5">
-              BidSure <span className="text-indigo-400 text-xs px-1.5 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 font-semibold">AI</span>
+            <div className="sidebar-title">
+              BidSure <span style={{ fontSize: 10, background: 'rgba(79, 70, 229, 0.25)', border: '1px solid rgba(79, 70, 229, 0.4)', color: '#818cf8', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>AI</span>
             </div>
-            <div className="text-slate-400 text-[10px] font-medium leading-none mt-1">Compliance Intelligence Platform</div>
+            <div className="sidebar-subtitle">Compliance Intelligence</div>
           </div>
         </div>
       </div>
 
       {/* System notice */}
-      <div className="px-3.5 py-2.5 bg-indigo-950/40 border border-indigo-500/20 mx-3 mt-3.5 rounded-lg shadow-inner">
-        <div className="text-[10px] text-indigo-300 font-medium leading-relaxed flex items-start gap-1.5">
-          <span className="text-amber-400 font-bold flex-shrink-0">⚠</span>
-          <span><strong>DECISION SUPPORT:</strong> All final determinations remain with the Procurement Officer.</span>
-        </div>
+      <div className="sidebar-notice">
+        <div style={{ fontWeight: 700, color: '#fbbf24', marginBottom: 2 }}>⚠ DECISION SUPPORT</div>
+        <div>All final determinations remain with the Procurement Officer.</div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 py-4">
-        <div className="px-3 mb-1">
-          <span className="text-[10px] font-semibold text-neutral-600 uppercase tracking-wider px-2">Navigation</span>
-        </div>
-        <ul className="space-y-0.5 px-2">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="sidebar-section-title">Navigation</div>
+        <div className="sidebar-nav">
           {NAV_ITEMS.map((item) => (
-            <li key={item.href}>
-              <NavLink
-                to={item.href}
-                end={item.href === '/'}
-                className={({ isActive }) =>
-                  clsx(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all group relative',
-                    isActive
-                      ? 'nav-item-active'
-                      : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <item.icon size={15} className={isActive ? 'text-blue-400' : 'text-neutral-500 group-hover:text-neutral-300'} />
-                    <span className="font-medium">{item.label}</span>
-                    {isActive && <ChevronRight size={12} className="ml-auto text-blue-400" />}
-                  </>
-                )}
-              </NavLink>
-            </li>
+            <NavLink
+              key={item.href}
+              to={item.href}
+              end={item.href === '/'}
+              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon size={16} color={isActive ? '#ffffff' : '#94a3b8'} />
+                  <span>{item.label}</span>
+                  {isActive && <ChevronRight size={14} color="#818cf8" style={{ marginLeft: 'auto' }} />}
+                </>
+              )}
+            </NavLink>
           ))}
-        </ul>
+        </div>
       </div>
 
       {/* Bottom: user + settings */}
-      <div className="border-t border-neutral-800 p-3 space-y-1">
+      <div className="sidebar-footer">
         <NavLink
           to="/settings"
-          className={({ isActive }) =>
-            clsx(
-              'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all',
-              isActive ? 'nav-item-active' : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
-            )
-          }
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          style={{ marginBottom: 8 }}
         >
-          <Settings size={14} className="text-neutral-500" />
-          <span className="font-medium">Settings</span>
+          <Settings size={16} color="#94a3b8" />
+          <span>Settings</span>
         </NavLink>
 
         {user && (
-          <div className="mt-2 pt-2 border-t border-neutral-800">
-            <div className="flex items-center gap-2.5 px-2 py-2">
-              <div className="w-7 h-7 rounded-full bg-blue-700 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-bold">{user.avatarInitials}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-white text-xs font-medium truncate">{user.name}</div>
-                <div className="text-neutral-500 text-[10px] truncate">{user.role}</div>
+          <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div className="sidebar-user-card">
+              <div className="sidebar-avatar">{user.avatarInitials}</div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div className="sidebar-user-name">{user.name}</div>
+                <div className="sidebar-user-role">{user.role}</div>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-neutral-400 hover:bg-neutral-800 hover:text-red-400 transition-all w-full mt-1"
+              className="sidebar-link"
+              style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: '#f87171' }}
             >
-              <LogOut size={13} />
-              <span className="font-medium">Sign Out</span>
+              <LogOut size={15} color="#f87171" />
+              <span>Sign Out</span>
             </button>
           </div>
         )}
@@ -136,25 +118,23 @@ export function Topbar({ breadcrumbs }: TopbarProps) {
   const { user } = useAuthStore();
 
   return (
-    <header className="topbar gap-3">
-      {breadcrumbs && (
-        <div className="flex items-center gap-1 text-sm text-neutral-500">
-          {breadcrumbs.map((b, i) => (
-            <span key={i} className="flex items-center gap-1">
-              {i > 0 && <ChevronRight size={12} />}
-              <span className={i === breadcrumbs.length - 1 ? 'text-neutral-900 font-medium' : ''}>{b.label}</span>
+    <header className="topbar">
+      <div className="breadcrumbs">
+        {breadcrumbs && breadcrumbs.map((b, i) => (
+          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {i > 0 && <ChevronRight size={12} color="#94a3b8" />}
+            <span className={`breadcrumb-item ${i === breadcrumbs.length - 1 ? 'active' : ''}`}>
+              {b.label}
             </span>
-          ))}
+          </span>
+        ))}
+      </div>
+      <div className="topbar-right">
+        <div className="topbar-user-info">
+          <div className="topbar-user-name">{user?.name}</div>
+          <div className="topbar-user-dept">{user?.department}</div>
         </div>
-      )}
-      <div className="ml-auto flex items-center gap-3">
-        <div className="text-right">
-          <div className="text-xs font-semibold text-neutral-800">{user?.name}</div>
-          <div className="text-[10px] text-neutral-500">{user?.department}</div>
-        </div>
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-          <span className="text-white text-xs font-bold">{user?.avatarInitials}</span>
-        </div>
+        <div className="topbar-avatar">{user?.avatarInitials}</div>
       </div>
     </header>
   );
@@ -165,9 +145,9 @@ export function Topbar({ breadcrumbs }: TopbarProps) {
 // ============================================================
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex">
+    <div className="app-shell">
       <Sidebar />
-      <div className="main-content flex-1">
+      <div className="main-wrapper">
         {children}
       </div>
     </div>

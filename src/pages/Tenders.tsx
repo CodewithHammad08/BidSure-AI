@@ -20,15 +20,15 @@ export function TendersPage() {
           actions={
             <button
               onClick={() => navigate('/tenders/new')}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn btn-primary"
             >
               + New Tender
             </button>
           }
         />
 
-        <div className="card" style={{ overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="card table-container">
+          <table className="custom-table">
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 {['Tender ID', 'Tender Name', 'Organization', 'Submission Date', 'Bidders', 'Requirements', 'Compliance', 'Last Analysis', ''].map(h => (

@@ -35,7 +35,7 @@ export default function Dashboard() {
           actions={
             <button
               onClick={() => navigate('/tenders/tender-001')}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn btn-primary"
             >
               Open Active Tender <ArrowRight size={14} />
             </button>
