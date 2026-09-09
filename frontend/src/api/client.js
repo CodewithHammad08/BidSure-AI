@@ -2,7 +2,7 @@ import { TENDERS, BIDDERS, FINDINGS, AUDIT_LOGS, VERIFICATION_PROVIDERS } from '
 
 const API_BASE = 'http://localhost:5000/api';
 
-async function fetchJson(url: string, options?: RequestInit) {
+async function fetchJson(url, options) {
   try {
     const res = await fetch(`${API_BASE}${url}`, {
       headers: {
@@ -24,7 +24,6 @@ export const api = {
     const data = await fetchJson('/stats');
     if (data) return data;
 
-    // Fallback
     const activeTenders = TENDERS.filter(t => t.status === 'ACTIVE').length;
     const totalBidders = BIDDERS.length;
     const totalDocs = 11;
@@ -46,7 +45,7 @@ export const api = {
   },
 
   // Auth
-  login: async (role: string) => {
+  login: async (role) => {
     const data = await fetchJson('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ role }),
@@ -60,7 +59,7 @@ export const api = {
     return data || TENDERS;
   },
 
-  getTenderById: async (id: string) => {
+  getTenderById: async (id) => {
     const data = await fetchJson(`/tenders/${id}`);
     return data || TENDERS.find(t => t.id === id);
   },
@@ -71,7 +70,7 @@ export const api = {
     return data || BIDDERS;
   },
 
-  getBidderById: async (id: string) => {
+  getBidderById: async (id) => {
     const data = await fetchJson(`/bidders/${id}`);
     return data || BIDDERS.find(b => b.id === id);
   },
@@ -82,12 +81,12 @@ export const api = {
     return data || FINDINGS;
   },
 
-  getFindingById: async (id: string) => {
+  getFindingById: async (id) => {
     const data = await fetchJson(`/findings/${id}`);
     return data || FINDINGS.find(f => f.id === id);
   },
 
-  updateFindingDecision: async (id: string, status: string, officerNote: string, reviewedBy: string) => {
+  updateFindingDecision: async (id, status, officerNote, reviewedBy) => {
     const data = await fetchJson(`/findings/${id}/decision`, {
       method: 'PATCH',
       body: JSON.stringify({ status, officerNote, reviewedBy }),
@@ -95,10 +94,9 @@ export const api = {
 
     if (data) return data;
 
-    // Fallback mutation for local mock state
     const finding = FINDINGS.find(f => f.id === id);
     if (finding) {
-      finding.status = status as any;
+      finding.status = status;
       finding.reviewNote = officerNote;
       finding.reviewedAt = new Date().toISOString();
     }
@@ -115,7 +113,7 @@ export const api = {
       previousState: 'OPEN',
       newState: status,
     };
-    AUDIT_LOGS.unshift(auditEntry as any);
+    AUDIT_LOGS.unshift(auditEntry);
     return { finding, auditEntry };
   },
 
@@ -131,7 +129,7 @@ export const api = {
     return data || VERIFICATION_PROVIDERS;
   },
 
-  testAdapterPing: async (id: string) => {
+  testAdapterPing: async (id) => {
     const data = await fetchJson(`/adapters/${id}/test`, {
       method: 'POST',
     });

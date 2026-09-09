@@ -4,7 +4,7 @@ import {
   ShieldCheck, AlertTriangle, CheckSquare, ClipboardList,
   Settings, LogOut, ChevronRight, Scale
 } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../store/authStore.js';
 
 const NAV_ITEMS = [
   { label: 'Overview',     icon: LayoutDashboard, href: '/' },
@@ -107,14 +107,7 @@ export function Sidebar() {
   );
 }
 
-// ============================================================
-// TOPBAR
-// ============================================================
-interface TopbarProps {
-  breadcrumbs?: { label: string }[];
-}
-
-export function Topbar({ breadcrumbs }: TopbarProps) {
+export function Topbar({ breadcrumbs }) {
   const { user } = useAuthStore();
 
   return (
@@ -140,10 +133,7 @@ export function Topbar({ breadcrumbs }: TopbarProps) {
   );
 }
 
-// ============================================================
-// APP SHELL
-// ============================================================
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children }) {
   return (
     <div className="app-shell">
       <Sidebar />

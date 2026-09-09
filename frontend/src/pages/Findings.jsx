@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '../api/client';
-import { AppShell, Topbar } from '../components/layout';
-import { PageHeader, SeverityBadge, EmptyState } from '../components/shared';
-import type { FindingDecision } from '../types';
+import { api } from '../api/client.js';
+import { AppShell, Topbar } from '../components/layout.jsx';
+import { PageHeader, SeverityBadge, EmptyState } from '../components/shared.jsx';
 import { FileText, CheckCircle, MessageSquare, X, ArrowRight, ShieldAlert, FileCheck, Layers } from 'lucide-react';
 
 export function FindingsPage() {
   const navigate = useNavigate();
-  const [findings, setFindings] = useState<any[]>([]);
-  const [severityFilter, setSeverityFilter] = useState<string>('ALL');
+  const [findings, setFindings] = useState([]);
+  const [severityFilter, setSeverityFilter] = useState('ALL');
 
   useEffect(() => {
     api.getFindings().then(setFindings);
@@ -101,10 +100,10 @@ export function FindingsPage() {
 }
 
 export function EvidenceViewerPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [finding, setFinding] = useState<any>(null);
-  const [decision, setDecision] = useState<FindingDecision | null>(null);
+  const [finding, setFinding] = useState(null);
+  const [decision, setDecision] = useState(null);
   const [officerNote, setOfficerNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -129,8 +128,8 @@ export function EvidenceViewerPage() {
     </AppShell>
   );
 
-  const handleRecordDecision = async (selectedDecision: string) => {
-    setDecision(selectedDecision as any);
+  const handleRecordDecision = async (selectedDecision) => {
+    setDecision(selectedDecision);
     setIsSaving(true);
     try {
       await api.updateFindingDecision(finding.id, selectedDecision, officerNote, 'Priya Nair (PO-001)');

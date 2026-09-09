@@ -1,22 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from './store/authStore';
-import LoginPage from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import { TendersPage, TenderDetailPage, RequirementsPage } from './pages/Tenders';
-import { BiddersPage, BidderDetailPage, DocumentDetailPage, AllDocumentsPage } from './pages/Bidders';
+import { useAuthStore } from './store/authStore.js';
+import LoginPage from './pages/Login.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import { TendersPage, TenderDetailPage, RequirementsPage } from './pages/Tenders.jsx';
+import { BiddersPage, BidderDetailPage, DocumentDetailPage, AllDocumentsPage } from './pages/Bidders.jsx';
 import {
   ComplianceMatrixPage, CrossDocVerificationPage,
   ComplianceScorePage, AllCompliancePage
-} from './pages/Compliance';
-import { FindingsPage, EvidenceViewerPage } from './pages/Findings';
+} from './pages/Compliance.jsx';
+import { FindingsPage, EvidenceViewerPage } from './pages/Findings.jsx';
 import {
   AuditTrailPage, VerificationGatewayPage,
   SettingsPage, BidderComparisonPage
-} from './pages/Misc';
+} from './pages/Misc.jsx';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 export default function App() {

@@ -4,14 +4,14 @@ import {
   FileText, Users, FolderOpen, AlertTriangle,
   ArrowRight, Activity
 } from 'lucide-react';
-import { api } from '../api/client';
-import { AppShell, Topbar } from '../components/layout';
-import { KpiCard, StatusBadge, SeverityBadge, SectionCard, PageHeader } from '../components/shared';
+import { api } from '../api/client.js';
+import { AppShell, Topbar } from '../components/layout.jsx';
+import { KpiCard, StatusBadge, SeverityBadge, SectionCard, PageHeader } from '../components/shared.jsx';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
-function formatTime(iso: string) {
+function formatTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -19,10 +19,10 @@ function formatTime(iso: string) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [stats, setStats] = useState<any>(null);
-  const [tenders, setTenders] = useState<any[]>([]);
-  const [findings, setFindings] = useState<any[]>([]);
-  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [stats, setStats] = useState(null);
+  const [tenders, setTenders] = useState([]);
+  const [findings, setFindings] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
 
   useEffect(() => {
     api.getStats().then(setStats);
@@ -109,14 +109,14 @@ export default function Dashboard() {
                     cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
                   />
                   <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {riskData.map((entry: any, i: number) => (
+                    {riskData.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
               <div style={{ display: 'flex', gap: 14, marginTop: 12, justifyContent: 'center' }}>
-                {riskData.map((r: any) => (
+                {riskData.map((r) => (
                   <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: r.color }} />
                     <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.name} ({r.count})</span>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tenders.map((t: any) => (
+                  {tenders.map((t) => (
                     <tr key={t.id} className="table-row">
                       <td>
                         <span className="font-mono" style={{ fontSize: 12, color: 'var(--cyan-400)', fontWeight: 700 }}>
@@ -186,7 +186,7 @@ export default function Dashboard() {
             }
           >
             <div>
-              {openFindings.slice(0, 5).map((finding: any) => (
+              {openFindings.slice(0, 5).map((finding) => (
                 <div
                   key={finding.id}
                   style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}
@@ -218,7 +218,7 @@ export default function Dashboard() {
             }
           >
             <div style={{ padding: '8px 0' }}>
-              {auditLogs.slice(0, 5).map((log: any) => (
+              {auditLogs.slice(0, 5).map((log) => (
                 <div key={log.id} style={{ display: 'flex', gap: 12, padding: '12px 18px', borderBottom: '1px solid var(--border-subtle)' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Activity size={14} color="var(--primary-400)" />
