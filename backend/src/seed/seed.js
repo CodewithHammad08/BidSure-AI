@@ -25,8 +25,21 @@ export const seedDatabase = async () => {
       AdapterStatus.deleteMany({})
     ]);
 
-    const hashedPass = await bcrypt.hash('password123', 10);
+    const adminHash    = await bcrypt.hash('Admin@2026',   12);
+    const officerHash  = await bcrypt.hash('Officer@2026', 12);
+    const auditorHash  = await bcrypt.hash('Auditor@2026', 12);
+
     const users = await User.insertMany([
+      {
+        id: 'user-000',
+        name: 'System Admin',
+        role: 'Admin',
+        department: 'BidSure AI Platform Administration',
+        avatarInitials: 'SA',
+        email: 'admin@gem.gov.in',
+        passwordHash: adminHash,
+        status: 'ACTIVE',
+      },
       {
         id: 'user-001',
         name: 'Priya Nair',
@@ -34,7 +47,8 @@ export const seedDatabase = async () => {
         department: 'Directorate of Public Works & Automation',
         avatarInitials: 'PN',
         email: 'priya.nair@gem.gov.in',
-        passwordHash: hashedPass
+        passwordHash: officerHash,
+        status: 'ACTIVE',
       },
       {
         id: 'user-002',
@@ -43,7 +57,8 @@ export const seedDatabase = async () => {
         department: 'National Audit & Oversight Cell',
         avatarInitials: 'RK',
         email: 'rajesh.kumar@audit.gov.in',
-        passwordHash: hashedPass
+        passwordHash: auditorHash,
+        status: 'ACTIVE',
       }
     ]);
 
