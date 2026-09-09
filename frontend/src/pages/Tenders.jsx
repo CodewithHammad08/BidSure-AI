@@ -1,19 +1,53 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { TENDERS, REQUIREMENTS, BIDDERS } from '../data/mockData.js';
+import { useNavigate, useParams } from 'react-router-dom';
+import { REQUIREMENTS } from '../data/mockData.js';
 import { api } from '../api/client.js';
 import { AppShell, Topbar } from '../components/layout.jsx';
 import { PageHeader, StatusBadge, SectionCard, EmptyState } from '../components/shared.jsx';
-import { FileText, ArrowRight, CheckCircle2, AlertTriangle, Plus, Search, Calendar } from 'lucide-react';
+import { FileText, ArrowRight, Plus, Search, X, CheckCircle } from 'lucide-react';
 
 export function TendersPage() {
   const navigate = useNavigate();
   const [tenders, setTenders] = useState([]);
   const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newTender, setNewTender] = useState({
+    title: '',
+    referenceNumber: '',
+    department: 'Ministry of Heavy Industries & Public Enterprises',
+    estimatedValue: '₹ 10,00,000',
+    submissionDeadline: '2026-10-15',
+  });
+
+  const loadTenders = () => {
+    api.getTenders().then(setTenders);
+  };
 
   useEffect(() => {
-    api.getTenders().then(setTenders);
+    loadTenders();
   }, []);
+
+  const handleCreateTender = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await api.createTender({
+        ...newTender,
+        requirements: [
+          { id: 'req-001', code: 'REQ-001', title: 'GST Registration Certificate', category: 'LEGAL', description: 'Mandatory GSTIN verification.', mandatory: true, pageRef: 12 },
+          { id: 'req-002', code: 'REQ-002', title: 'MSME / Udyam Registration', category: 'LEGAL', description: 'Udyam certificate.', mandatory: true, pageRef: 14 }
+        ]
+      });
+      setShowModal(false);
+      setNewTender({ title: '', referenceNumber: '', department: 'Ministry of Heavy Industries & Public Enterprises', estimatedValue: '₹ 10,00,000', submissionDeadline: '2026-10-15' });
+      loadTenders();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const filtered = tenders.filter(t =>
     t.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -27,6 +61,11 @@ export function TendersPage() {
         <PageHeader
           title="Procurement Tenders"
           subtitle="Manage active tenders, mandatory compliance rules, and registered bidder packages"
+          actions={
+            <button onClick={() => setShowModal(true)} className="btn btn-primary">
+              <Plus size={16} /> Create New Tender
+            </button>
+          }
         />
 
         <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
@@ -68,7 +107,7 @@ export function TendersPage() {
                   </div>
                   <div>
                     <div style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 600 }}>Registered Bidders</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--cyan-400)' }}>{t.biddersCount || t.bidderCount} Bidders</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--cyan-400)' }}>{t.biddersCount || t.bidderCount || 0} Bidders</div>
                   </div>
                 </div>
               </div>
@@ -85,6 +124,81 @@ export function TendersPage() {
             </div>
           ))}
         </div>
+
+        {/* CREATE TENDER MODAL */}
+        {showModal && (
+          <div style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
+          }}>
+            <div className="card" style={{ width: 480, padding: 28, position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#ffffff' }}>Create New Tender</h3>
+                <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateTender} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Tender Title</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Procurement of High-Precision CNC Machinery"
+                    value={newTender.title}
+                    onChange={e => setNewTender({ ...newTender, title: e.target.value })}
+                    style={{ width: '100%', padding: '10px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: '#ffffff', fontSize: 13, outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Reference Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. GEM/2026/B/9988776"
+                    value={newTender.referenceNumber}
+                    onChange={e => setNewTender({ ...newTender, referenceNumber: e.target.value })}
+                    style={{ width: '100%', padding: '10px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: '#ffffff', fontSize: 13, outline: 'none' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Estimated Value</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTender.estimatedValue}
+                      onChange={e => setNewTender({ ...newTender, estimatedValue: e.target.value })}
+                      style={{ width: '100%', padding: '10px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: '#ffffff', fontSize: 13, outline: 'none' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Submission Deadline</label>
+                    <input
+                      type="date"
+                      required
+                      value={newTender.submissionDeadline}
+                      onChange={e => setNewTender({ ...newTender, submissionDeadline: e.target.value })}
+                      style={{ width: '100%', padding: '10px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)', borderRadius: 8, color: '#ffffff', fontSize: 13, outline: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn btn-primary"
+                  style={{ marginTop: 10, width: '100%' }}
+                >
+                  {isSubmitting ? 'Saving to MongoDB Atlas...' : 'Save Tender to MongoDB Atlas'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

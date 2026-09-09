@@ -30,6 +30,7 @@ router.post('/', async (req, res) => {
     const newTender = new Tender({
       ...req.body,
       id: req.body.id || `tender-00${count + 1}`,
+      publishDate: req.body.publishDate || new Date().toISOString().split('T')[0],
       biddersCount: 0,
       status: 'ACTIVE'
     });

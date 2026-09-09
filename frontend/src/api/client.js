@@ -1,4 +1,4 @@
-import { TENDERS, BIDDERS, FINDINGS, AUDIT_LOGS, VERIFICATION_PROVIDERS } from '../data/mockData';
+import { TENDERS, BIDDERS, FINDINGS, AUDIT_LOGS, VERIFICATION_PROVIDERS } from '../data/mockData.js';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -64,6 +64,16 @@ export const api = {
     return data || TENDERS.find(t => t.id === id);
   },
 
+  createTender: async (tenderData) => {
+    const data = await fetchJson('/tenders', {
+      method: 'POST',
+      body: JSON.stringify(tenderData),
+    });
+    if (data) return data;
+    TENDERS.unshift(tenderData);
+    return tenderData;
+  },
+
   // Bidders
   getBidders: async () => {
     const data = await fetchJson('/bidders');
@@ -75,6 +85,16 @@ export const api = {
     return data || BIDDERS.find(b => b.id === id);
   },
 
+  createBidder: async (bidderData) => {
+    const data = await fetchJson('/bidders', {
+      method: 'POST',
+      body: JSON.stringify(bidderData),
+    });
+    if (data) return data;
+    BIDDERS.unshift(bidderData);
+    return bidderData;
+  },
+
   // Findings
   getFindings: async () => {
     const data = await fetchJson('/findings');
@@ -84,6 +104,16 @@ export const api = {
   getFindingById: async (id) => {
     const data = await fetchJson(`/findings/${id}`);
     return data || FINDINGS.find(f => f.id === id);
+  },
+
+  createFinding: async (findingData) => {
+    const data = await fetchJson('/findings', {
+      method: 'POST',
+      body: JSON.stringify(findingData),
+    });
+    if (data) return data;
+    FINDINGS.unshift(findingData);
+    return findingData;
   },
 
   updateFindingDecision: async (id, status, officerNote, reviewedBy) => {

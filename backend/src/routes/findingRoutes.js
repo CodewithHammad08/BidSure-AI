@@ -33,6 +33,36 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Create / Flag new finding
+router.post('/', async (req, res) => {
+  try {
+    const count = await Finding.countDocuments();
+    const newFinding = new Finding({
+      ...req.body,
+      id: req.body.id || `finding-00${count + 1}`,
+      status: 'OPEN'
+    });
+    await newFinding.save();
+
+    const auditEntry = new AuditLog({
+      id: `audit-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      userId: 'user-001',
+      userName: 'Priya Nair',
+      userRole: 'Procurement Officer',
+      actionType: 'COMPLIANCE_EVALUATION',
+      entityType: 'FINDING',
+      entityId: newFinding.id,
+      detail: `New compliance finding flagged: ${newFinding.title} (${newFinding.bidderName})`
+    });
+    await auditEntry.save();
+
+    res.status(201).json(newFinding);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.patch('/:id/decision', async (req, res) => {
   try {
     const { status, officerNote, reviewedBy } = req.body;
