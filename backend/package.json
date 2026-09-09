@@ -1,13 +1,13 @@
 {
   "name": "bidsure-ai-backend",
   "version": "1.0.0",
-  "description": "BidSure-AI Express MongoDB API Server",
-  "main": "dist/server.js",
+  "description": "BidSure-AI Express MongoDB API Server (JavaScript)",
+  "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "seed": "tsx src/seed/seed.ts"
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/seed/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,14 +16,5 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^22.10.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
   }
 }
