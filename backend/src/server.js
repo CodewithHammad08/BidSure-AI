@@ -39,10 +39,20 @@ connectDB().then(async () => {
     console.log('[Notice]: Seed skipped or ran in-memory.');
   }
 
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`====================================================`);
     console.log(`🛡️  BidSure-AI Express Server (JS) running on port ${PORT}`);
     console.log(`📡  API Root: http://localhost:${PORT}/api`);
     console.log(`====================================================`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`\n⚠️  [Port ${PORT} in use]: The BidSure-AI backend server is ALREADY running on port ${PORT}!`);
+      console.log(`📡  Your API is active and ready at: http://localhost:${PORT}/api\n`);
+      process.exit(0);
+    } else {
+      console.error('[Server Error]:', err);
+    }
   });
 });
