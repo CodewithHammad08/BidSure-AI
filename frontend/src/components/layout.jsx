@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Users, FolderOpen,
   ShieldCheck, AlertTriangle, CheckSquare, ClipboardList,
-  Settings, LogOut, ChevronRight, Scale
+  Settings, LogOut, ChevronRight, Scale, ShieldAlert
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore.js';
 
@@ -70,6 +70,25 @@ export function Sidebar() {
             </NavLink>
           ))}
         </div>
+
+        {/* Admin Console link – only visible to Admin role */}
+        {user?.role === 'Admin' && (
+          <div style={{ padding: '8px 12px' }}>
+            <NavLink
+              to="/admin"
+              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+              style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 8 }}
+            >
+              {({ isActive }) => (
+                <>
+                  <ShieldAlert size={16} color={isActive ? '#a78bfa' : '#a78bfa'} />
+                  <span style={{ color: '#a78bfa', fontWeight: 700 }}>Admin Console</span>
+                  {isActive && <ChevronRight size={14} color="#a78bfa" style={{ marginLeft: 'auto' }} />}
+                </>
+              )}
+            </NavLink>
+          </div>
+        )}
       </div>
 
       {/* Bottom: user + settings */}

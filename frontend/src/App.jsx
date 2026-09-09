@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore.js';
 import LoginPage from './pages/Login.jsx';
+import AdminPage from './pages/Admin.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import { TendersPage, TenderDetailPage, RequirementsPage } from './pages/Tenders.jsx';
 import { BiddersPage, BidderDetailPage, DocumentDetailPage, AllDocumentsPage } from './pages/Bidders.jsx';
@@ -19,12 +20,20 @@ function ProtectedRoute({ children }) {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
+function AdminRoute({ children }) {
+  const { isAuthenticated, user } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== 'Admin') return <Navigate to="/" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
 
         {/* Protected */}
         <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
