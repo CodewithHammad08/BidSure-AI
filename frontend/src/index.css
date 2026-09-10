@@ -583,3 +583,136 @@ html, body {
   50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.85); }
   100% { box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
 }
+
+/* ============================================================
+   LOADING & SKELETON STATES
+   ============================================================ */
+
+@keyframes shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   TOOLTIPS
+   ============================================================ */
+
+[data-tip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(15,23,42,0.97);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 7px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+[data-tip]:hover::after { opacity: 1; }
+
+/* ============================================================
+   FORM INPUTS — GLOBAL POLISH
+   ============================================================ */
+
+input, select, textarea {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(99,102,241,0.6) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+/* ============================================================
+   RESPONSIVE — SIDEBAR COLLAPSED
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .sidebar { width: 220px; min-width: 220px; }
+  .main-wrapper { margin-left: 220px; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+  .main-wrapper { margin-left: 0; }
+  .page-container { padding: 20px 16px 40px; }
+  .topbar { padding: 0 20px; }
+  .sidebar-nav { flex-direction: row; flex-wrap: wrap; padding: 8px 12px; }
+  .app-shell { flex-direction: column; }
+}
+
+/* ============================================================
+   NOTIFICATION TOAST ANIMATIONS
+   ============================================================ */
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(40px); }
+}
+
+/* ============================================================
+   TRANSITION HELPERS
+   ============================================================ */
+
+.transition-all { transition: all 0.2s ease; }
+.transition-colors { transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ============================================================
+   SECTION DIVIDERS
+   ============================================================ */
+
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 20px 0;
+}
+

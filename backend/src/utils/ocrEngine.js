@@ -5,7 +5,8 @@ import { createRequire } from 'module';
 import { createWorker } from 'tesseract.js';
 
 const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
+const pdfParseReq = require('pdf-parse');
+const pdfParse = typeof pdfParseReq === 'function' ? pdfParseReq : (pdfParseReq.default || pdfParseReq);
 
 /**
  * Extracts text, metadata, SHA256, and structured entity fields from a document file.
