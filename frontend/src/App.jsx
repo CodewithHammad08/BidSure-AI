@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore.js';
 import LoginPage from './pages/Login.jsx';
 import AdminPage from './pages/Admin.jsx';
+import BidderPortal from './pages/BidderPortal.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import { TendersPage, TenderDetailPage, RequirementsPage } from './pages/Tenders.jsx';
 import { BiddersPage, BidderDetailPage, DocumentDetailPage, AllDocumentsPage } from './pages/Bidders.jsx';
@@ -34,6 +35,7 @@ export default function App() {
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+        <Route path="/portal" element={<ProtectedRoute><BidderPortal /></ProtectedRoute>} />
 
         {/* Protected */}
         <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

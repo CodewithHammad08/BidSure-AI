@@ -49,47 +49,63 @@ export function Sidebar() {
         <div>All final determinations remain with the Procurement Officer.</div>
       </div>
 
-      {/* Navigation */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div className="sidebar-section-title">Navigation</div>
-        <div className="sidebar-nav">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              end={item.href === '/'}
-              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-            >
-              {({ isActive }) => (
-                <>
-                  <item.icon size={16} color={isActive ? '#ffffff' : '#94a3b8'} />
-                  <span>{item.label}</span>
-                  {isActive && <ChevronRight size={14} color="#818cf8" style={{ marginLeft: 'auto' }} />}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </div>
+        {/* Navigation */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="sidebar-section-title">Navigation</div>
+          <div className="sidebar-nav">
+            {user?.role === 'Bidder' && (
+              <NavLink
+                to="/portal"
+                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                style={{ background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 8, marginBottom: 8 }}
+              >
+                {({ isActive }) => (
+                  <>
+                    <FileText size={16} color="#38bdf8" />
+                    <span style={{ color: '#38bdf8', fontWeight: 700 }}>Bidder Portal</span>
+                    {isActive && <ChevronRight size={14} color="#38bdf8" style={{ marginLeft: 'auto' }} />}
+                  </>
+                )}
+              </NavLink>
+            )}
 
-        {/* Admin Console link – only visible to Admin role */}
-        {user?.role === 'Admin' && (
-          <div style={{ padding: '8px 12px' }}>
-            <NavLink
-              to="/admin"
-              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-              style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 8 }}
-            >
-              {({ isActive }) => (
-                <>
-                  <ShieldAlert size={16} color={isActive ? '#a78bfa' : '#a78bfa'} />
-                  <span style={{ color: '#a78bfa', fontWeight: 700 }}>Admin Console</span>
-                  {isActive && <ChevronRight size={14} color="#a78bfa" style={{ marginLeft: 'auto' }} />}
-                </>
-              )}
-            </NavLink>
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                end={item.href === '/'}
+                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+              >
+                {({ isActive }) => (
+                  <>
+                    <item.icon size={16} color={isActive ? '#ffffff' : '#94a3b8'} />
+                    <span>{item.label}</span>
+                    {isActive && <ChevronRight size={14} color="#818cf8" style={{ marginLeft: 'auto' }} />}
+                  </>
+                )}
+              </NavLink>
+            ))}
           </div>
-        )}
-      </div>
+
+          {/* Admin Console link – only visible to Admin role */}
+          {user?.role === 'Admin' && (
+            <div style={{ padding: '8px 12px' }}>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 8 }}
+              >
+                {({ isActive }) => (
+                  <>
+                    <ShieldAlert size={16} color={isActive ? '#a78bfa' : '#a78bfa'} />
+                    <span style={{ color: '#a78bfa', fontWeight: 700 }}>Admin Console</span>
+                    {isActive && <ChevronRight size={14} color="#a78bfa" style={{ marginLeft: 'auto' }} />}
+                  </>
+                )}
+              </NavLink>
+            </div>
+          )}
+        </div>
 
       {/* Bottom: user + settings */}
       <div className="sidebar-footer">
@@ -160,5 +176,14 @@ export function AppShell({ children }) {
         {children}
       </div>
     </div>
+  );
+}
+
+export default function Layout({ title, children }) {
+  return (
+    <AppShell>
+      <Topbar breadcrumbs={[{ label: 'BidSure AI' }, { label: title || 'Portal' }]} />
+      {children}
+    </AppShell>
   );
 }

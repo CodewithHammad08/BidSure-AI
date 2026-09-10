@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { seedDatabase } from './seed/seed.js';
 
+import path from 'path';
 import authRoutes from './routes/authRoutes.js';
 import tenderRoutes from './routes/tenderRoutes.js';
 import bidderRoutes from './routes/bidderRoutes.js';
@@ -19,6 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use('/uploads', express.static(path.resolve('uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tenders', tenderRoutes);

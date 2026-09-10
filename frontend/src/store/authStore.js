@@ -32,12 +32,12 @@ export const useAuthStore = create(
       },
 
       // ── Signup (new user registration) ────────────────────────────────────
-      signup: async ({ name, email, password, role, department, requestNote }) => {
+      signup: async ({ name, email, password, role, department, requestNote, companyName, gstin, udyamNo, cin }) => {
         try {
           const res = await fetch(`${API_BASE}/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role, department, requestNote }),
+            body: JSON.stringify({ name, email, password, role, department, requestNote, companyName, gstin, udyamNo, cin }),
           });
           const data = await res.json();
 
@@ -45,7 +45,7 @@ export const useAuthStore = create(
             return { success: false, error: data.error || 'Signup failed.' };
           }
 
-          // If the role is immediately activated (Compliance Auditor), log them in
+          // If immediately activated (Compliance Auditor or Bidder), log them in
           if (data.token) {
             set({ user: data.user, token: data.token, isAuthenticated: true });
             return { success: true, autoLogin: true };

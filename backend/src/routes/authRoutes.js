@@ -33,6 +33,10 @@ function userPublic(user) {
     avatarInitials: user.avatarInitials,
     email: user.email,
     status: user.status,
+    companyName: user.companyName || '',
+    gstin: user.gstin || '',
+    udyamNo: user.udyamNo || '',
+    cin: user.cin || '',
     requestNote: user.requestNote,
     approvedBy: user.approvedBy,
     approvedAt: user.approvedAt,
@@ -43,21 +47,21 @@ function userPublic(user) {
 // ────────────────────────────────────────────────────────────────────────────
 // POST /api/auth/signup
 // Registers a new user.
+// • Bidder               → immediately ACTIVE
 // • Compliance Auditor   → immediately ACTIVE
 // • Procurement Officer  → status PENDING_APPROVAL (admin must approve)
-// • Admin                → immediately ACTIVE (only allowed if no admin exists yet)
 // ────────────────────────────────────────────────────────────────────────────
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, role, department, requestNote } = req.body;
+    const { name, email, password, role, department, requestNote, companyName, gstin, udyamNo, cin } = req.body;
 
     if (!name || !email || !password || !role || !department) {
-      return res.status(400).json({ error: 'All fields are required.' });
+      return res.status(400).json({ error: 'All mandatory fields are required.' });
     }
 
-    const allowedRoles = ['Compliance Auditor', 'Procurement Officer'];
+    const allowedRoles = ['Compliance Auditor', 'Procurement Officer', 'Bidder'];
     if (!allowedRoles.includes(role)) {
-      return res.status(400).json({ error: 'Invalid role. Choose Compliance Auditor or Procurement Officer.' });
+      return res.status(400).json({ error: 'Invalid role. Choose Bidder, Procurement Officer, or Compliance Auditor.' });
     }
 
     const exists = await User.findOne({ email: email.toLowerCase() });
@@ -81,9 +85,13 @@ router.post('/signup', async (req, res) => {
       email: email.toLowerCase(),
       passwordHash,
       role,
-      department,
+      department: department || 'General',
       avatarInitials: initials,
       status,
+      companyName: companyName || '',
+      gstin: gstin || '',
+      udyamNo: udyamNo || '',
+      cin: cin || '',
       requestNote: requestNote || '',
     });
 

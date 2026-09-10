@@ -4,10 +4,14 @@ const DocumentItemSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   type: { type: String, required: true },
-  pageCount: { type: Number, required: true },
-  extractedFields: { type: Number, required: true },
-  confidenceScore: { type: Number, required: true },
-  sha256: { type: String, required: true }
+  pageCount: { type: Number, required: true, default: 1 },
+  extractedFields: { type: Number, required: true, default: 5 },
+  confidenceScore: { type: Number, required: true, default: 90 },
+  sha256: { type: String, required: true, default: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+  filePath: { type: String, default: '' },
+  ocrText: { type: String, default: '' },
+  ocrStatus: { type: String, enum: ['SUCCESS', 'PENDING', 'PARTIAL', 'FAILED'], default: 'SUCCESS' },
+  extractedFieldsMap: { type: Object, default: {} },
 });
 
 const RapidFuzzResultSchema = new mongoose.Schema({
@@ -22,13 +26,15 @@ const RapidFuzzResultSchema = new mongoose.Schema({
 
 const BidderSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
+  bidderUserId: { type: String, default: '' },
   tenderId: { type: String, required: true },
   companyName: { type: String, required: true },
   gstin: { type: String, required: true },
-  udyamNo: { type: String, required: true },
-  cin: { type: String, required: true },
-  score: { type: Number, required: true },
-  riskLevel: { type: String, required: true, enum: ['LOW', 'MEDIUM', 'HIGH'] },
+  udyamNo: { type: String, default: '' },
+  cin: { type: String, default: '' },
+  quotedAmount: { type: String, default: '' },
+  score: { type: Number, required: true, default: 85 },
+  riskLevel: { type: String, required: true, enum: ['LOW', 'MEDIUM', 'HIGH'], default: 'LOW' },
   submittedAt: { type: String, required: true },
   documents: [DocumentItemSchema],
   crossDocVerification: [RapidFuzzResultSchema],

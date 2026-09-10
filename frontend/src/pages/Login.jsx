@@ -131,7 +131,14 @@ function LoginForm({ onSwitch }) {
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      navigate('/');
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser?.role === 'Bidder') {
+        navigate('/portal');
+      } else if (currentUser?.role === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else if (result.pending) {
       setPendingMsg(result.error);
     } else {
@@ -140,7 +147,7 @@ function LoginForm({ onSwitch }) {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: 420 }}>
+    <div style={{ width: '100%', maxWidth: 440 }}>
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ color: 'white', fontSize: 24, fontWeight: 800, marginBottom: 6 }}>Sign In</h2>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
@@ -153,12 +160,13 @@ function LoginForm({ onSwitch }) {
         background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)',
         borderRadius: 10, padding: '12px 16px', marginBottom: 22,
       }}>
-        <p style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, marginBottom: 6 }}>🔑 Demo Credentials</p>
+        <p style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, marginBottom: 6 }}>🔑 Quick Demo Accounts</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {[
-            ['Admin', 'admin@gem.gov.in', 'Admin@2026'],
+            ['Bidder (Vendor)', 'bidder@apextech.in', 'Bidder@2026'],
             ['Procurement Officer', 'priya.nair@gem.gov.in', 'Officer@2026'],
             ['Compliance Auditor', 'rajesh.kumar@audit.gov.in', 'Auditor@2026'],
+            ['System Admin', 'admin@gem.gov.in', 'Admin@2026'],
           ].map(([role, em, pw]) => (
             <button
               key={role}
@@ -166,10 +174,10 @@ function LoginForm({ onSwitch }) {
               onClick={() => { setEmail(em); setPassword(pw); }}
               style={{
                 background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer',
-                color: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'monospace', padding: '1px 0',
+                color: 'rgba(255,255,255,0.6)', fontSize: 11, fontFamily: 'monospace', padding: '2px 0',
               }}
             >
-              {role}: {em} / {pw}
+              <strong style={{ color: '#38bdf8' }}>{role}:</strong> {em} / {pw}
             </button>
           ))}
         </div>
@@ -198,7 +206,7 @@ function LoginForm({ onSwitch }) {
         <div style={{ marginBottom: 16 }}>
           <label style={LABEL_STYLE}>Email Address</label>
           <input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            required placeholder="your.email@gem.gov.in" style={INPUT_STYLE} />
+            required placeholder="your.email@company.com" style={INPUT_STYLE} />
         </div>
 
         <div style={{ marginBottom: 22, position: 'relative' }}>
@@ -242,7 +250,7 @@ function LoginForm({ onSwitch }) {
         <div style={{ display: 'flex', gap: 8 }}>
           <ShieldCheck size={14} color="rgba(255,255,255,0.3)" style={{ flexShrink: 0, marginTop: 1 }} />
           <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, lineHeight: 1.6 }}>
-            Authorized GeM Procurement Portal access only. All interactions logged in immutable audit trail.
+            Authorized GeM Procurement Portal access. Bidders and officers must provide verified credentials.
           </p>
         </div>
       </div>
@@ -257,8 +265,12 @@ function SignupForm({ onSwitch }) {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'Compliance Auditor',
-    department: '',
+    role: 'Bidder',
+    department: 'Apex Technologies',
+    companyName: 'Apex Tech Solutions Pvt Ltd',
+    gstin: '27AAACA0000A1Z5',
+    udyamNo: 'UDYAM-MH-03-0012345',
+    cin: 'U72900MH2018PTC312456',
     requestNote: '',
   });
   const [showPw, setShowPw] = useState(false);
@@ -288,7 +300,12 @@ function SignupForm({ onSwitch }) {
     if (!result.success) {
       setError(result.error);
     } else if (result.autoLogin) {
-      navigate('/');
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser?.role === 'Bidder') {
+        navigate('/portal');
+      } else {
+        navigate('/');
+      }
     } else {
       setSuccess({ pending: true, message: result.message });
     }
@@ -319,11 +336,11 @@ function SignupForm({ onSwitch }) {
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: 460 }}>
+    <div style={{ width: '100%', maxWidth: 480 }}>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ color: 'white', fontSize: 24, fontWeight: 800, marginBottom: 6 }}>Create Account</h2>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
-          Register for BidSure AI — Procurement Officers require admin approval.
+          Register for BidSure AI — Bidders are auto-activated immediately.
         </p>
       </div>
 
@@ -341,28 +358,60 @@ function SignupForm({ onSwitch }) {
           <div>
             <label style={LABEL_STYLE}>Full Name</label>
             <input id="signup-name" type="text" value={form.name} onChange={set('name')}
-              required placeholder="Priya Nair" style={INPUT_STYLE} />
+              required placeholder="Vikram Mehta" style={INPUT_STYLE} />
           </div>
           <div>
-            <label style={LABEL_STYLE}>Role</label>
+            <label style={LABEL_STYLE}>User Role</label>
             <select id="signup-role" value={form.role} onChange={set('role')} style={{ ...INPUT_STYLE, cursor: 'pointer' }}>
-              <option value="Compliance Auditor">Compliance Auditor</option>
+              <option value="Bidder">Bidder (Vendor / Contractor)</option>
               <option value="Procurement Officer">Procurement Officer</option>
+              <option value="Compliance Auditor">Compliance Auditor</option>
             </select>
           </div>
         </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <label style={LABEL_STYLE}>Official Email Address</label>
-          <input id="signup-email" type="email" value={form.email} onChange={set('email')}
-            required placeholder="name@gem.gov.in" style={INPUT_STYLE} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+          <div>
+            <label style={LABEL_STYLE}>Email Address</label>
+            <input id="signup-email" type="email" value={form.email} onChange={set('email')}
+              required placeholder="name@company.com" style={INPUT_STYLE} />
+          </div>
+          <div>
+            <label style={LABEL_STYLE}>Department / Category</label>
+            <input id="signup-department" type="text" value={form.department} onChange={set('department')}
+              required placeholder="e.g. IT & Software Infrastructure" style={INPUT_STYLE} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <label style={LABEL_STYLE}>Department / Ministry</label>
-          <input id="signup-department" type="text" value={form.department} onChange={set('department')}
-            required placeholder="e.g. Ministry of Heavy Industries" style={INPUT_STYLE} />
-        </div>
+        {form.role === 'Bidder' && (
+          <div style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 10, padding: 14, marginBottom: 14 }}>
+            <div style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, marginBottom: 10, letterSpacing: '0.05em' }}>
+              🏢 BIDDER & VENDOR BUSINESS DETAILS
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label style={LABEL_STYLE}>Registered Company Name</label>
+              <input id="signup-company" type="text" value={form.companyName} onChange={set('companyName')}
+                required placeholder="Apex Tech Solutions Pvt Ltd" style={INPUT_STYLE} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={LABEL_STYLE}>GSTIN Number</label>
+                <input id="signup-gstin" type="text" value={form.gstin} onChange={set('gstin')}
+                  required placeholder="27AAACA0000A1Z5" style={INPUT_STYLE} />
+              </div>
+              <div>
+                <label style={LABEL_STYLE}>Udyam Registration</label>
+                <input id="signup-udyam" type="text" value={form.udyamNo} onChange={set('udyamNo')}
+                  placeholder="UDYAM-MH-03-0012345" style={INPUT_STYLE} />
+              </div>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <label style={LABEL_STYLE}>CIN / Business Registration</label>
+              <input id="signup-cin" type="text" value={form.cin} onChange={set('cin')}
+                placeholder="U72900MH2018PTC312456" style={INPUT_STYLE} />
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
           <div style={{ position: 'relative' }}>

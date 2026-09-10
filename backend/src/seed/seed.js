@@ -28,6 +28,7 @@ export const seedDatabase = async () => {
     const adminHash    = await bcrypt.hash('Admin@2026',   12);
     const officerHash  = await bcrypt.hash('Officer@2026', 12);
     const auditorHash  = await bcrypt.hash('Auditor@2026', 12);
+    const bidderHash   = await bcrypt.hash('Bidder@2026',  12);
 
     const users = await User.insertMany([
       {
@@ -59,7 +60,21 @@ export const seedDatabase = async () => {
         email: 'rajesh.kumar@audit.gov.in',
         passwordHash: auditorHash,
         status: 'ACTIVE',
-      }
+      },
+      {
+        id: 'user-003',
+        name: 'Vikram Mehta',
+        role: 'Bidder',
+        department: 'Apex Tech Solutions Pvt Ltd',
+        avatarInitials: 'VM',
+        email: 'bidder@apextech.in',
+        passwordHash: bidderHash,
+        status: 'ACTIVE',
+        companyName: 'Apex Tech Solutions Pvt Ltd',
+        gstin: '27AAACA0000A1Z5',
+        udyamNo: 'UDYAM-MH-03-0012345',
+        cin: 'U72900MH2018PTC312456',
+      },
     ]);
 
     const tenders = await Tender.insertMany([
