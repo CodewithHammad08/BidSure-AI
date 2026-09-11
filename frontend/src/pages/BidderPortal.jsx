@@ -462,24 +462,94 @@ export default function BidderPortal() {
                 )}
 
                 {submitSuccess && (
-                  <div style={{
-                    background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
-                    borderRadius: 10, padding: 16, marginBottom: 16, color: '#4ade80', fontSize: 13,
-                  }}>
-                    <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>🎉 Bid Placed Successfully!</div>
-                    <div>Bid ID: {submitSuccess.id} | Score: {submitSuccess.score}%</div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('my-bids')}
-                      style={{
-                        marginTop: 10, background: '#10b981', color: 'white', border: 'none',
-                        borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontWeight: 700, fontSize: 12
-                      }}
-                    >
-                      View Submitted Bids →
-                    </button>
+                  <div style={{ marginBottom: 16 }}>
+                    {/* Gemini AI Success Header */}
+                    <div style={{
+                      background: 'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(16,185,129,0.1))',
+                      border: '1px solid rgba(16,185,129,0.35)',
+                      borderRadius: 12, padding: '18px 20px', marginBottom: 12,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                        <span style={{ fontSize: 22 }}>🎉</span>
+                        <div>
+                          <div style={{ color: '#4ade80', fontWeight: 800, fontSize: 15 }}>Bid Submitted & AI Evaluated!</div>
+                          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>Gemini AI compliance analysis complete</div>
+                        </div>
+                      </div>
+
+                      {/* AI Score Row */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
+                        <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
+                          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>AI Score</div>
+                          <div style={{ fontSize: 28, fontWeight: 900, color: submitSuccess.score >= 90 ? '#34d399' : submitSuccess.score >= 70 ? '#fbbf24' : '#f87171' }}>
+                            {submitSuccess.score}
+                          </div>
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
+                          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>Risk Level</div>
+                          <div style={{
+                            fontSize: 14, fontWeight: 800, marginTop: 4,
+                            color: submitSuccess.riskLevel === 'LOW' ? '#34d399' : submitSuccess.riskLevel === 'MEDIUM' ? '#fbbf24' : '#f87171'
+                          }}>
+                            {submitSuccess.riskLevel || 'LOW'}
+                          </div>
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
+                          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>Anomaly</div>
+                          <div style={{
+                            fontSize: 14, fontWeight: 800, marginTop: 4,
+                            color: submitSuccess.anomalyDetected ? '#f87171' : '#34d399'
+                          }}>
+                            {submitSuccess.anomalyDetected ? '⚠ YES' : '✓ NONE'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* AI Summary */}
+                      {submitSuccess.aiSummary && (
+                        <div style={{
+                          background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                          borderRadius: 8, padding: '10px 12px', marginBottom: 12,
+                        }}>
+                          <div style={{ color: '#818cf8', fontSize: 11, fontWeight: 700, marginBottom: 5 }}>✦ GEMINI AI ASSESSMENT</div>
+                          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                            {submitSuccess.aiSummary}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* AI Findings */}
+                      {submitSuccess.findingsList && submitSuccess.findingsList.length > 0 && (
+                        <div style={{ marginBottom: 12 }}>
+                          <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' }}>AI Audit Findings</div>
+                          {submitSuccess.findingsList.slice(0, 3).map((f, i) => (
+                            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                              <span style={{ color: '#34d399', fontSize: 12 }}>✓</span>
+                              <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, lineHeight: 1.5 }}>{f}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, marginBottom: 10 }}>
+                        Bid ID: <span style={{ fontFamily: 'monospace', color: '#38bdf8' }}>{submitSuccess.id}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('my-bids')}
+                        style={{
+                          background: 'linear-gradient(135deg,#10b981,#059669)', color: 'white', border: 'none',
+                          borderRadius: 8, padding: '8px 18px', cursor: 'pointer', fontWeight: 700, fontSize: 13,
+                          display: 'flex', alignItems: 'center', gap: 8,
+                        }}
+                      >
+                        View All My Bids →
+                      </button>
+                    </div>
                   </div>
                 )}
+
 
                 <div style={{ marginBottom: 18 }}>
                   <label style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' }}>
@@ -639,11 +709,39 @@ export default function BidderPortal() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>Compliance Score</div>
-                        <div style={{ color: '#4ade80', fontSize: 18, fontWeight: 800 }}>{bid.score}%</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                      {/* AI Score Badge */}
+                      <div style={{ textAlign: 'center', minWidth: 70 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', fontWeight: 700 }}>AI Score</div>
+                        <div style={{
+                          fontSize: 24, fontWeight: 900,
+                          color: bid.score >= 90 ? '#34d399' : bid.score >= 70 ? '#fbbf24' : '#f87171'
+                        }}>{bid.score}</div>
                       </div>
+
+                      {/* Risk Badge */}
+                      <div style={{ textAlign: 'center', minWidth: 70 }}>
+                        <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'uppercase', fontWeight: 700 }}>Risk</div>
+                        <div style={{
+                          fontSize: 12, fontWeight: 800, marginTop: 4, padding: '2px 8px', borderRadius: 4,
+                          background: bid.riskLevel === 'LOW' ? 'rgba(16,185,129,0.15)' : bid.riskLevel === 'MEDIUM' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
+                          color: bid.riskLevel === 'LOW' ? '#34d399' : bid.riskLevel === 'MEDIUM' ? '#fbbf24' : '#f87171',
+                          border: `1px solid ${bid.riskLevel === 'LOW' ? 'rgba(16,185,129,0.3)' : bid.riskLevel === 'MEDIUM' ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                        }}>
+                          {bid.riskLevel || 'LOW'}
+                        </div>
+                      </div>
+
+                      {/* Anomaly */}
+                      {bid.anomalyDetected && (
+                        <div style={{
+                          background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
+                          borderRadius: 6, padding: '4px 10px', color: '#f87171', fontSize: 12, fontWeight: 700,
+                          display: 'flex', alignItems: 'center', gap: 5, alignSelf: 'center',
+                        }}>
+                          ⚠ Anomaly
+                        </div>
+                      )}
 
                       {bid.documents && bid.documents.length > 0 && (
                         <button
@@ -651,13 +749,14 @@ export default function BidderPortal() {
                           style={{
                             background: 'linear-gradient(135deg,#6366f1,#3b82f6)', color: 'white',
                             border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700,
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, alignSelf: 'center',
                           }}
                         >
                           <Eye size={14} /> View OCR Docs ({bid.documents.length})
                         </button>
                       )}
                     </div>
+
                   </div>
                 ))}
               </div>

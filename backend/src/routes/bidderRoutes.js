@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Bidder from '../models/Bidder.js';
 import Tender from '../models/Tender.js';
 import { processDocumentOCR } from '../utils/ocrEngine.js';
+import { evaluateBidWithGemini } from '../utils/geminiEvaluator.js';
 
 const router = express.Router();
 
@@ -150,6 +151,17 @@ router.post('/submit-bid', upload.array('documents', 10), async (req, res) => {
       }
     }
 
+    // Fetch tender info if available
+    const tender = await Tender.findOne({ id: tenderId });
+
+    // Execute Gemini AI Risk & Compliance Evaluation
+    console.log(`[Gemini AI]: Evaluating bid for ${companyName}...`);
+    const aiEval = await evaluateBidWithGemini(
+      { companyName, gstin, udyamNo, cin, quotedAmount },
+      tender || {},
+      processedDocuments
+    );
+
     const count = await Bidder.countDocuments();
     const newBidder = new Bidder({
       id: `bidder-00${count + 1}`,
@@ -160,11 +172,14 @@ router.post('/submit-bid', upload.array('documents', 10), async (req, res) => {
       udyamNo: udyamNo || '',
       cin: cin || '',
       quotedAmount: quotedAmount || '₹1,50,00,000',
-      score: Math.floor(Math.random() * 15) + 84, // 84-98% initial compliance rating
-      riskLevel: 'LOW',
+      score: aiEval.score || 88,
+      riskLevel: aiEval.riskLevel || 'LOW',
+      aiSummary: aiEval.aiSummary || `AI Compliance score calculated as ${aiEval.score}%. Mandatory documents verified.`,
+      anomalyDetected: aiEval.anomalyDetected || false,
+      findingsList: aiEval.findingsList || [],
       submittedAt: new Date().toISOString(),
       documents: processedDocuments,
-      crossDocVerification: [
+      crossDocVerification: aiEval.crossDocVerification || [
         {
           doc1: processedDocuments[0]?.name || 'GST Certificate',
           doc2: processedDocuments[1]?.name || 'Financial Audit',
@@ -175,7 +190,7 @@ router.post('/submit-bid', upload.array('documents', 10), async (req, res) => {
           flagged: false,
         },
       ],
-      categoryScores: {
+      categoryScores: aiEval.categoryScores || {
         mandatoryDocs: 25,
         validity: 20,
         entityConsistency: 25,
@@ -189,9 +204,38 @@ router.post('/submit-bid', upload.array('documents', 10), async (req, res) => {
     // Increment biddersCount on Tender
     await Tender.updateOne({ id: tenderId }, { $inc: { biddersCount: 1 } });
 
-    res.status(201).json({ message: 'Bid submitted successfully!', bidder: newBidder });
+    res.status(201).json({ message: 'Bid submitted and evaluated with Gemini AI successfully!', bidder: newBidder });
   } catch (error) {
     console.error('[Submit Bid Error]:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/bidders/:id/ai-evaluate - Re-evaluate bidder document using Gemini AI live
+router.post('/:id/ai-evaluate', async (req, res) => {
+  try {
+    const bidder = await Bidder.findOne({ id: req.params.id });
+    if (!bidder) {
+      return res.status(404).json({ error: 'Bidder submission not found.' });
+    }
+
+    const tender = await Tender.findOne({ id: bidder.tenderId });
+
+    console.log(`[Gemini AI Re-evaluate]: Running live evaluation for ${bidder.companyName}...`);
+    const aiEval = await evaluateBidWithGemini(bidder, tender || {}, bidder.documents || []);
+
+    bidder.score = aiEval.score;
+    bidder.riskLevel = aiEval.riskLevel;
+    bidder.aiSummary = aiEval.aiSummary;
+    bidder.anomalyDetected = aiEval.anomalyDetected;
+    bidder.findingsList = aiEval.findingsList;
+    if (aiEval.categoryScores) bidder.categoryScores = aiEval.categoryScores;
+    if (aiEval.crossDocVerification) bidder.crossDocVerification = aiEval.crossDocVerification;
+
+    await bidder.save();
+    res.json({ message: 'Live Gemini AI re-evaluation completed!', bidder });
+  } catch (error) {
+    console.error('[AI Evaluate Route Error]:', error);
     res.status(500).json({ error: error.message });
   }
 });

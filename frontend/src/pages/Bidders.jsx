@@ -205,16 +205,50 @@ export function BidderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [bidder, setBidder] = useState(null);
+  const [evaluating, setEvaluating] = useState(false);
+  const [evalMsg, setEvalMsg] = useState('');
+
+  const loadBidder = () => {
+    if (id) api.getBidderById(id).then(setBidder);
+  };
 
   useEffect(() => {
-    if (id) {
-      api.getBidderById(id).then(setBidder);
-    }
+    loadBidder();
   }, [id]);
+
+  const handleAIReEvaluate = async () => {
+    if (!bidder) return;
+    setEvaluating(true);
+    setEvalMsg('');
+    try {
+      const res = await fetch(`http://localhost:5000/api/bidders/${bidder.id}/ai-evaluate`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setBidder(data.bidder);
+        setEvalMsg('✓ Gemini AI re-evaluation completed successfully.');
+      } else {
+        setEvalMsg(`⚠ Evaluation failed: ${data.error}`);
+      }
+    } catch (err) {
+      setEvalMsg('⚠ Could not connect to backend for AI evaluation.');
+    } finally {
+      setEvaluating(false);
+    }
+  };
 
   if (!bidder) return (
     <AppShell><Topbar /><div className="page-container"><EmptyState title="Bidder loading or not found" /></div></AppShell>
   );
+
+  const scoreColor = bidder.score >= 90 ? 'var(--emerald-400)' : bidder.score >= 70 ? 'var(--amber-400)' : 'var(--rose-400)';
+  const catScores = bidder.categoryScores || {};
+  const catItems = [
+    { label: 'Mandatory Docs', val: catScores.mandatoryDocs ?? 25, max: 25 },
+    { label: 'Validity', val: catScores.validity ?? 20, max: 20 },
+    { label: 'Entity Consistency', val: catScores.entityConsistency ?? 25, max: 25 },
+    { label: 'Technical Requirements', val: catScores.technicalRequirements ?? 20, max: 20 },
+    { label: 'Verification Checks', val: catScores.verificationChecks ?? 10, max: 10 },
+  ];
 
   return (
     <AppShell>
@@ -222,62 +256,221 @@ export function BidderDetailPage() {
       <div className="page-container">
         <PageHeader
           title={bidder.companyName || bidder.name}
-          subtitle={`GSTIN / Registration: ${bidder.gstin || bidder.registrationNumber || bidder.id}`}
+          subtitle={`GSTIN: ${bidder.gstin || bidder.id} · CIN: ${bidder.cin || '—'} · Udyam: ${bidder.udyamNo || '—'}`}
           actions={
-            <button
-              onClick={() => navigate(`/bidders/${bidder.id}/compliance`)}
-              className="btn btn-primary"
-            >
-              View Compliance Matrix →
-            </button>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={handleAIReEvaluate}
+                disabled={evaluating}
+                style={{
+                  background: evaluating ? 'rgba(99,102,241,0.4)' : 'linear-gradient(135deg,#6366f1,#3b82f6)',
+                  border: 'none', color: 'white', borderRadius: 10,
+                  padding: '10px 18px', cursor: evaluating ? 'not-allowed' : 'pointer',
+                  fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8,
+                  boxShadow: '0 4px 16px rgba(99,102,241,0.35)', transition: 'all 0.2s',
+                }}
+              >
+                {evaluating ? (
+                  <><span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Evaluating...</>
+                ) : (
+                  <>✦ Re-Evaluate with Gemini AI</>
+                )}
+              </button>
+              <button
+                onClick={() => navigate(`/bidders/${bidder.id}/compliance`)}
+                className="btn btn-primary"
+              >
+                View Compliance Matrix →
+              </button>
+            </div>
           }
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20 }}>
-          <div className="card" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#ffffff', marginBottom: 14 }}>Profile Overview</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Compliance Score</div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: bidder.score >= 80 ? 'var(--emerald-400)' : 'var(--amber-400)' }}>
-                  {bidder.score} / 100
-                </div>
+        {evalMsg && (
+          <div style={{
+            background: evalMsg.startsWith('✓') ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+            border: `1px solid ${evalMsg.startsWith('✓') ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}`,
+            borderRadius: 10, padding: '10px 16px', marginBottom: 20,
+            color: evalMsg.startsWith('✓') ? '#34d399' : '#f87171', fontSize: 13, fontWeight: 600,
+          }}>
+            {evalMsg}
+          </div>
+        )}
+
+        {/* Anomaly Alert Banner */}
+        {bidder.anomalyDetected && (
+          <div style={{
+            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.4)',
+            borderRadius: 12, padding: '12px 18px', marginBottom: 20,
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <span style={{ fontSize: 20 }}>⚠</span>
+            <div>
+              <div style={{ color: '#f87171', fontWeight: 700, fontSize: 14 }}>Anomaly Detected by Gemini AI</div>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 2 }}>
+                This bidder submission triggered anomaly flags during AI evaluation. Please review findings carefully before award.
               </div>
-              <div>
-                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Risk Rating</div>
-                <RiskChip level={bidder.riskLevel || 'LOW'} />
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 20, marginBottom: 20 }}>
+          {/* LEFT: Score + AI Summary */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Score Card */}
+            <div className="card" style={{ padding: 24 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>AI Compliance Score</h3>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 48, fontWeight: 900, color: scoreColor, lineHeight: 1 }}>{bidder.score}</div>
+                <div style={{ fontSize: 18, color: 'var(--text-muted)', marginBottom: 4 }}>/100</div>
+              </div>
+              <div style={{ height: 6, borderRadius: 6, background: 'rgba(255,255,255,0.07)', marginBottom: 12 }}>
+                <div style={{ height: '100%', borderRadius: 6, width: `${bidder.score}%`, background: `linear-gradient(90deg, ${scoreColor}, ${scoreColor}88)`, transition: 'width 0.6s' }} />
+              </div>
+              <RiskChip level={bidder.riskLevel || 'LOW'} />
+            </div>
+
+            {/* Category Scores */}
+            <div className="card" style={{ padding: 22 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>Category Breakdown</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {catItems.map(c => (
+                  <div key={c.label}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{c.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{c.val}/{c.max}</span>
+                    </div>
+                    <div style={{ height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.07)' }}>
+                      <div style={{ height: '100%', borderRadius: 4, width: `${(c.val / c.max) * 100}%`, background: 'linear-gradient(90deg,#6366f1,#38bdf8)' }} />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          <SectionCard title="Submitted Document Repository">
-            <div className="table-container">
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Document Name</th>
-                    <th>Type</th>
-                    <th>Pages</th>
-                    <th>SHA-256 Hash</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(bidder.documents || DOCUMENTS).map(d => (
-                    <tr key={d.id} className="table-row">
-                      <td style={{ fontWeight: 600, color: '#ffffff' }}>{d.name || d.fileName}</td>
-                      <td><span className="badge badge-info">{d.type || d.documentType}</span></td>
-                      <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{d.pageCount} Pages</td>
-                      <td className="font-mono" style={{ fontSize: 11, color: 'var(--cyan-400)' }}>
-                        {(d.sha256 || 'e3b0c44...').slice(0, 16)}...
-                      </td>
-                    </tr>
+          {/* RIGHT: AI Summary + Findings */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* AI Executive Summary */}
+            {bidder.aiSummary && (
+              <div className="card" style={{ padding: 22 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8,
+                    background: 'linear-gradient(135deg,#6366f1,#3b82f6)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14
+                  }}>✦</div>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>Gemini AI Executive Summary</h3>
+                </div>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 8, padding: '12px 14px' }}>
+                  {bidder.aiSummary}
+                </p>
+              </div>
+            )}
+
+            {/* AI Findings List */}
+            {bidder.findingsList && bidder.findingsList.length > 0 && (
+              <div className="card" style={{ padding: 22 }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 14 }}>AI Audit Findings</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {bidder.findingsList.map((f, i) => (
+                    <div key={i} style={{
+                      display: 'flex', gap: 10, padding: '10px 12px',
+                      background: 'rgba(0,0,0,0.2)', borderRadius: 8,
+                      border: '1px solid rgba(255,255,255,0.06)',
+                    }}>
+                      <span style={{ color: '#34d399', marginTop: 1, flexShrink: 0 }}>✓</span>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>{f}</span>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </SectionCard>
+                </div>
+              </div>
+            )}
+
+            {/* Cross-Doc Verification Table */}
+            {bidder.crossDocVerification && bidder.crossDocVerification.length > 0 && (
+              <SectionCard title="Cross-Document Verification (AI)">
+                <div className="table-container">
+                  <table className="custom-table">
+                    <thead>
+                      <tr>
+                        <th>Field</th>
+                        <th>Document A</th>
+                        <th>Document B</th>
+                        <th>Similarity</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bidder.crossDocVerification.map((cv, i) => (
+                        <tr key={i} className="table-row">
+                          <td style={{ fontWeight: 700, color: 'var(--cyan-400)', fontSize: 12 }}>{cv.field}</td>
+                          <td style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{cv.doc1}</td>
+                          <td style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{cv.doc2}</td>
+                          <td style={{ fontWeight: 700, color: cv.similarityPercentage >= 90 ? 'var(--emerald-400)' : 'var(--amber-400)' }}>
+                            {cv.similarityPercentage}%
+                          </td>
+                          <td>
+                            <span style={{
+                              fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                              background: cv.flagged ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)',
+                              color: cv.flagged ? '#f87171' : '#34d399',
+                              border: `1px solid ${cv.flagged ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`,
+                            }}>
+                              {cv.flagged ? '⚠ FLAGGED' : '✓ MATCH'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </SectionCard>
+            )}
+          </div>
         </div>
+
+        {/* Documents Table */}
+        <SectionCard title="Submitted Document Repository">
+          <div className="table-container">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Document Name</th>
+                  <th>Type</th>
+                  <th>Pages</th>
+                  <th>Confidence</th>
+                  <th>OCR Status</th>
+                  <th>SHA-256 Hash</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(bidder.documents || DOCUMENTS).map(d => (
+                  <tr key={d.id} className="table-row">
+                    <td style={{ fontWeight: 600, color: '#ffffff' }}>{d.name || d.fileName}</td>
+                    <td><span className="badge badge-info">{d.type || d.documentType}</span></td>
+                    <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{d.pageCount} Pages</td>
+                    <td style={{ fontWeight: 700, color: d.confidenceScore >= 90 ? 'var(--emerald-400)' : 'var(--amber-400)' }}>{d.confidenceScore}%</td>
+                    <td>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+                        background: d.ocrStatus === 'SUCCESS' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+                        color: d.ocrStatus === 'SUCCESS' ? '#34d399' : '#fbbf24',
+                      }}>
+                        {d.ocrStatus || 'SUCCESS'}
+                      </span>
+                    </td>
+                    <td className="font-mono" style={{ fontSize: 11, color: 'var(--cyan-400)' }}>
+                      {(d.sha256 || 'e3b0c44...').slice(0, 16)}...
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
       </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </AppShell>
   );
 }
@@ -289,3 +482,4 @@ export function DocumentDetailPage() {
 export function AllDocumentsPage() {
   return <BiddersPage />;
 }
+
